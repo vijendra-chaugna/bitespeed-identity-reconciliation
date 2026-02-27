@@ -1,4 +1,3 @@
-// src/index.ts
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -20,12 +19,10 @@ const identifyController = new IdentifyController();
 // Routes
 app.post("/identify", identifyController.identify);
 
-// Health check
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });
 });
 
-// Initialize database and start server
 initializeDatabase().then(() => {
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

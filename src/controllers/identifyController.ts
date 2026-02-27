@@ -1,4 +1,3 @@
-// src/controllers/identifyController.ts
 import { Request, Response } from "express";
 import { ContactService } from "../services/contactService";
 import { IdentifyRequest } from "../types";
@@ -14,7 +13,6 @@ export class IdentifyController {
     try {
       const { email, phoneNumber } = req.body as IdentifyRequest;
 
-      // Validate that at least one field is provided
       if (!email && !phoneNumber) {
         res.status(400).json({
           error: "Either email or phoneNumber must be provided"

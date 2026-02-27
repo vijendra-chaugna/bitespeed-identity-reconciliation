@@ -1,4 +1,3 @@
-// src/services/contactService.ts
 import { AppDataSource } from "../utils/database.ts";
 import { ContactEntity } from "../models/contactModel";
 import { IdentifyRequest, IdentifyResponse, LinkPrecedence } from "../types";
@@ -9,30 +8,23 @@ export class ContactService {
   async identify(request: IdentifyRequest): Promise<IdentifyResponse> {
     const { email, phoneNumber } = request;
 
-    // Find all contacts matching either email or phone number
     const matchingContacts = await this.findMatchingContacts(email, phoneNumber);
 
-    // If no matching contacts, create a new primary contact
     if (matchingContacts.length === 0) {
       const newContact = await this.createPrimaryContact(email, phoneNumber);
       return this.formatResponse(newContact, [newContact]);
     }
 
-    // Get all primary contacts from the matching contacts
     const primaryContacts = await this.getPrimaryContacts(matchingContacts);
     
-    // Determine the primary contact (oldest one)
     const primaryContact = this.getOldestContact(primaryContacts);
     
-    // If there are multiple primary contacts, consolidate them
     if (primaryContacts.length > 1) {
       await this.consolidatePrimaryContacts(primaryContact, primaryContacts);
     }
 
-    // Get all contacts in this hierarchy
     const allContacts = await this.getAllContactsInHierarchy(primaryContact.id);
     
-    // Check if we need to create a new secondary contact
     const needsNewSecondary = await this.checkNeedsNewSecondary(
       primaryContact.id,
       email,
@@ -107,13 +99,11 @@ export class ContactService {
   ): Promise<void> {
     for (const contact of allPrimaryContacts) {
       if (contact.id !== primaryContact.id) {
-        // Update this primary to secondary
         contact.linkPrecedence = LinkPrecedence.SECONDARY;
         contact.linkedId = primaryContact.id;
         contact.updatedAt = new Date();
         await this.contactRepository.save(contact);
 
-        // Update all secondaries linked to this contact
         await this.contactRepository.update(
           { linkedId: contact.id },
           { linkedId: primaryContact.id, updatedAt: new Date() }

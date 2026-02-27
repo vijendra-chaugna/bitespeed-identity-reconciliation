@@ -1,4 +1,3 @@
-// src/models/contactModel.ts
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { LinkPrecedence } from "../types";
 
